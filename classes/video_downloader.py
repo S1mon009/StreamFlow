@@ -15,7 +15,6 @@ from decorators.timed import timed
 from decorators.ffmpeg import ffmpeg_required
 from decorators.connected import is_connected, network_required
 
-
 class VideoDownloader:
     """
     A class to handle video downloading from YouTube.
@@ -30,10 +29,10 @@ class VideoDownloader:
 
     QUALITY_MAP = {
     'The best': 'bestvideo+bestaudio/best',
-    'Medium': 'bestvideo[height<=1440]+bestaudio/best[height<=1440]',
-    'Above High': 'bestvideo[height<=1080]+bestaudio/best[height<=1080]',
-    'High': 'bestvideo[height<=720]+bestaudio/best[height<=720]',
-    'Low': 'bestvideo[height<=480]+bestaudio/best[height<=480]'
+    'Medium (1440p)': 'bestvideo[height<=1440]+bestaudio/best[height<=1440]',
+    'Above High (1080p)': 'bestvideo[height<=1080]+bestaudio/best[height<=1080]',
+    'High (720p)': 'bestvideo[height<=720]+bestaudio/best[height<=720]',
+    'Low (<=480p)': 'bestvideo[height<=480]+bestaudio/best[height<=480]'
 }
     OUTPUT_FORMATS = ['Mkv', 'Mp4']
 
@@ -160,7 +159,7 @@ class VideoDownloader:
             'postprocessors': [{
                 'key': 'FFmpegVideoConvertor',
                 'preferedformat': self.output_format.lower()
-            }]
+            }],
         }
 
         try:
