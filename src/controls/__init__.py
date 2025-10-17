@@ -1,6 +1,7 @@
 """
 This module exports the controls used in the application's.
 """
-from .sidebar import ModernNavBar
+from .sidebar import Sidebar
+from .settings import Settings
 
-__all__ = ["ModernNavBar"]
+__all__ = ["Sidebar", "Settings"]

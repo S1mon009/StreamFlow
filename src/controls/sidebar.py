@@ -1,7 +1,7 @@
 """
 Modern navigation sidebar for a Flet-based video downloader UI.
 
-This module defines the ModernNavBar class to build a collapsible sidebar with
+This module defines the sidebar class to build a collapsible sidebar with
 user information and navigation icons, and includes a layout function to render
 the sidebar alongside a toggle button for visibility control.
 """
@@ -9,7 +9,7 @@ import time
 from math import pi
 import flet as ft
 
-class ModernNavBar:
+class Sidebar:
     """
     A modern sidebar navigation component for a Flet-based UI application.
     
@@ -18,7 +18,7 @@ class ModernNavBar:
 
     def __init__(self, func,page) -> None:
         """
-        Initialize the ModernNavBar with a callback function to toggle sidebar visibility.
+        Initialize the sidebar with a callback function to toggle sidebar visibility.
 
         Args:
             func (Callable): A function that will be triggered on icon/button interactions.
@@ -96,14 +96,12 @@ class ModernNavBar:
                 controls=[
                     ft.IconButton(
                         icon=icon_name, icon_size=18, 
-                        # icon_color="white54",
                         style=ft.ButtonStyle(
                             shape={"": ft.RoundedRectangleBorder(radius=7)},
                             overlay_color={"": "transparent"},
                         )
                     ),
                     ft.Text(value=text, 
-                            # color="white54", 
                             size=12, opacity=1, animate_opacity=200),
                 ],
             )
@@ -174,7 +172,7 @@ def create_layout(page: ft.Page) -> ft.Row:
         sidebar.update()
         toggle_btn.update()
 
-    navbar = ModernNavBar(animate_sidebar, page).build()
+    navbar = Sidebar(animate_sidebar, page).build()
 
     sidebar = ft.Container(
         width=200,
