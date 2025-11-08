@@ -2,8 +2,8 @@
 Main script for the Video Downloader application.
 
 This script initializes the `VideoDownloader` class, prompts the user for download options,
-and handles multiple download requests in a loop. It supports both single links and TXT files
-with multiple links, as well as video or audio download modes.
+and handles multiple download requests in a loop. It supports both single video links
+and TXT files containing multiple links, as well as video or audio download modes.
 """
 
 import time
@@ -12,18 +12,19 @@ from classes.video_downloader import VideoDownloader
 from utils.console import clear_console
 
 
-def main():
-    """
-    Main function that runs the video downloader application.
+def main() -> None:
+    """Run the Video Downloader application.
 
     Steps:
-    1. Clears the console.
-    2. Repeatedly prompts the user for download options (link or TXT file).
-    3. If the user confirms, the download process starts.
-    4. After each batch, the user is asked if they want to download more.
-    5. The loop continues until the user declines further downloads.
-    """
+        1. Clears the console.
+        2. Prompts the user repeatedly for download options (single URL or TXT file).
+        3. If the user confirms the options, starts the download process.
+        4. After each batch, asks the user if they want to download more.
+        5. Continues the loop until the user declines further downloads.
 
+    Returns:
+        None
+    """
     clear_console()
     while True:
         downloader = VideoDownloader()
@@ -51,7 +52,6 @@ def main():
             break
 
         clear_console()
-
 
 if __name__ == "__main__":
     main()

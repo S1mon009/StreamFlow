@@ -1,15 +1,25 @@
 """
-Module providing a decorator for measuring function execution time.
+This module provides a decorator for measuring the execution time of functions.
 
-This module defines the `timed` decorator, which measures the execution time of a function 
-and displays it in seconds or minutes, depending on the duration.
+Functions:
+    timed: Decorator that measures and displays the execution time of the decorated function.
 """
 
 import time
 
-def timed(func):
-    """Decorator measuring the time of performing the function."""
-    def wrapper(*args, **kwargs):
+def timed(func:callable) -> callable:
+    """Decorator that measures and displays the execution time of a function.
+
+    The execution time is shown in seconds if less than 60 seconds, 
+    otherwise in minutes.
+
+    Args:
+        func (Callable): Function to decorate.
+
+    Returns:
+        Callable: Wrapped function that measures execution time.
+    """
+    def wrapper(*args:tuple, **kwargs:dict[str, dict]) -> callable:
         start_time = time.time()
         result = func(*args, **kwargs)
         end_time = time.time()

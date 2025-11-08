@@ -1,0 +1,3 @@
+# Timed module
+
+:::decorators.timed

@@ -1,0 +1,3 @@
+# Connected module
+
+:::decorators.connected

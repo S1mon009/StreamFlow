@@ -1,17 +1,18 @@
 """
-Module providing a utility function for the console.
+This module provides utility functions for console operations.
 
-This module defines the `clear_console()` function, which clears the terminal screen 
-on both Windows and Unix-based systems.
+Functions:
+    clear_console: Clears the terminal screen on both Windows and Unix-based systems.
 """
 
 import os
 
-def clear_console():
-    """
-    Clears the console screen.
+def clear_console() -> None:
+    """Clear the console screen.
 
-    Works for both Windows ('cls') and Unix-based ('clear') operating systems.
-    """
+    This function works for both Windows ('cls') and Unix-based ('clear') operating systems.
 
+    Returns:
+        None
+    """
     os.system('cls' if os.name == 'nt' else 'clear')

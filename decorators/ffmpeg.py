@@ -1,15 +1,24 @@
 """
-Module providing a decorator for verifying the presence of FFmpeg.
+This module provides a decorator for verifying the presence of FFmpeg.
 
-This module defines the `ffmpeg_required` decorator, which ensures that FFmpeg 
-is installed before executing the decorated function.
+Functions:
+    ffmpeg_required: Ensures FFmpeg is installed before executing the decorated function.
 """
 
 import subprocess
 
-def ffmpeg_required(func):
-    """Decorator checking that ffmpeg is installed."""
-    def wrapper(*args, **kwargs):
+def ffmpeg_required(func:callable) -> callable:
+    """Decorator that checks if FFmpeg is installed before running a function.
+
+    If FFmpeg is not found, prints an error message and prevents the function from executing.
+
+    Args:
+        func (Callable): Function to decorate.
+
+    Returns:
+        Callable: Wrapped function that verifies FFmpeg installation.
+    """
+    def wrapper(*args:tuple, **kwargs:dict[str, dict]) -> callable:
         try:
             subprocess.run(['ffmpeg', '-version'], capture_output=True, text=True, check=True)
         except FileNotFoundError:

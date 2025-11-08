@@ -1,0 +1,74 @@
+site_name: Video Downloader Docs (CLI)
+site_description: Documentation for the Video Downloader app (CLI version)
+site_author: S1mon009
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+      media: "(prefers-color-scheme: light)"
+    - scheme: slate 
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+      media: "(prefers-color-scheme: dark)"
+  features:
+    - navigation.expand
+    - navigation.instant
+    - navigation.top
+    - navigation.footer
+    - content.code.annotate
+    - content.tabs.link
+  language: en
+
+nav:
+  - Home: index.md
+  - Main: main.md
+  - Classes:
+      - Classes module: classes/__init__.md
+      - VideoDownloader: classes/video_downloader.md
+  - Decorators:
+      - Decorators module: decorators/__init__.md
+      - connected: decorators/connected.md
+      - ffmpeg: decorators/ffmpeg.md
+      - timed: decorators/timed.md
+  - Utilities:
+      - Utilities module: utils/__init__.md
+      - console: utils/console.md
+  - Config:
+      - Config module: config/__init__.md
+      - app_config: config/app_config.md
+      - video_settings: config/video_settings.md
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            docstring_style: google
+            show_source: false
+            show_root_toc_entry: true
+            show_root_heading: true
+            heading_level: 2
+            filters:
+              - "!^_"
+  - autorefs
+
+markdown_extensions:
+  - admonition
+  - codehilite
+  - toc:
+      permalink: true
+  - tables
+  - def_list
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight
