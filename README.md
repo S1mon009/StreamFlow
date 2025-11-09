@@ -34,7 +34,7 @@ Each interface is stored on a separate branch:
 ## Installation
 1. Clone the repository
 ```bash
-git clone https://github.com/your-username/streamflow.git
+git clone https://github.com/S1mon009/StreamFlow.git
 cd streamflow
 ```
 
@@ -99,3 +99,4 @@ ffmpeg -version
 ## License
 MIT License - for educational and non-commercial use.
 Always respect third-party content rights.
+
