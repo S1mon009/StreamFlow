@@ -8,6 +8,7 @@ and TXT files containing multiple links, as well as video or audio download mode
 
 import time
 import inquirer
+from art import text2art
 from classes.video_downloader import VideoDownloader
 from utils.console import clear_console
 
@@ -26,6 +27,7 @@ def main() -> None:
         None
     """
     clear_console()
+    print(text2art("StreamFlow"))
     while True:
         downloader = VideoDownloader()
         downloader.prompt_user_options()
