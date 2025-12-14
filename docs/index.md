@@ -20,7 +20,7 @@ The Video Downloader app provides a command-line interface to:
 ## Installation
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/S1mon009/StreamFlow
 cd my_project
 pip install -r requirements.txt
 ```

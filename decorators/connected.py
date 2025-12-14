@@ -41,6 +41,11 @@ def network_required(func:callable) -> callable:
         Callable: Wrapped function that checks network connectivity before execution.
     """
     def wrapper(*args:tuple, **kwargs:dict[str, dict]) -> callable:
+        """Wrapper that waits for network connectivity and then calls the function.
+
+        Returns:
+            Any: The return value of the wrapped function.
+        """
         while not is_connected():
             print("No network connection. Waiting for the reinstatement of the connection ...")
             time.sleep(5)

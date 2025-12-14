@@ -47,7 +47,14 @@ class VideoDownloader:
         self.mode = None
 
     def verify_download_folder(self) -> None:
-        """Check if the download folder exists, or prompt the user to provide one."""
+        """Ensure the configured download folder exists, prompting user if needed.
+
+        If the configured folder does not exist, the user can provide a different
+        path. The function will create the folder if it does not exist.
+
+        Returns:
+            None: This function updates the instance's ``download_folder`` attribute.
+        """
         question = [
             inquirer.Confirm('use_default',
                              message=f"Is the default download path ({self.download_folder}) correct?",
@@ -62,7 +69,14 @@ class VideoDownloader:
             os.makedirs(self.download_folder)
 
     def prompt_user_options(self) -> None:
-        """Prompt the user to select URLs, mode, quality, output format, and playlist folder."""
+        """Prompt the user for download source, mode and format options.
+
+        After this call the instance attributes ``urls``, ``mode``, ``quality`` and
+        ``output_format`` will be set based on user choices.
+
+        Returns:
+            None
+        """
         source_ans = inquirer.prompt([
             inquirer.List('source',
                           message="Choose source of links", choices=['Single URL', 'TXT File'])
@@ -141,10 +155,14 @@ class VideoDownloader:
     @network_required
     @timed
     def download_video(self) -> None:
-        """Download all URLs using yt-dlp and cookies.txt.
+        """Download configured URLs using ``yt-dlp`` and the project's cookies.
 
-        Handles playlists and non-playlist videos, applying the selected quality
-        and output format.
+        Applies the selected quality and output format. Handles playlists by
+        placing downloads in a playlist folder when configured. Errors from
+        ``subprocess`` calls are caught and reported per-URL.
+
+        Returns:
+            None
         """
         for url in self.urls:
             is_playlist = 'list=' in url
