@@ -34,7 +34,6 @@ class VideoDownloader:
         playlist_folder (str): Folder path for playlist downloads.
         mode (str): Download mode, either 'Video' or 'Audio only'.
     """
-
     def __init__(self):
         """Initialize the downloader and verify the download folder."""
         self.download_folder = app_config.download_folder
@@ -187,7 +186,6 @@ class VideoDownloader:
             if is_playlist and self.playlist_folder:
                 output_path = os.path.join(self.playlist_folder, '%(title)s.%(ext)s')
             else:
-                # If a single URL and a custom filename was provided, use it
                 if len(self.urls) == 1 and self.custom_filename and not is_playlist:
                     output_path = os.path.join(self.download_folder, f"{self.custom_filename}.%(ext)s")
                 else:
