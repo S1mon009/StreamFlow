@@ -1,7 +1,7 @@
 # Video Downloader Documentation
 
 Welcome to the official documentation for the **Video Downloader** application.  
-This application allows downloading videos, audio, and playlists from YouTube using `yt-dlp`, with support for multiple qualities, output formats, and network handling.
+This application allows downloading videos, audio, and playlists from YouTube using `yt-dlp` and `ffmpeg`, with support for multiple qualities, output formats, and network handling.
 
 ---
 
