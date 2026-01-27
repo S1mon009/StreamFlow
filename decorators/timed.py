@@ -20,6 +20,11 @@ def timed(func:callable) -> callable:
         Callable: Wrapped function that measures execution time.
     """
     def wrapper(*args:tuple, **kwargs:dict[str, dict]) -> callable:
+        """Wrapper that measures execution time of the wrapped function.
+
+        Returns:
+            Any: The return value of the wrapped function.
+        """
         start_time = time.time()
         result = func(*args, **kwargs)
         end_time = time.time()

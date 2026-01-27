@@ -19,6 +19,11 @@ def ffmpeg_required(func:callable) -> callable:
         Callable: Wrapped function that verifies FFmpeg installation.
     """
     def wrapper(*args:tuple, **kwargs:dict[str, dict]) -> callable:
+        """Wrapper that checks FFmpeg availability and calls the wrapped function.
+
+        Returns:
+            Any: The return value of the wrapped function, or ``None`` if FFmpeg is missing.
+        """
         try:
             subprocess.run(['ffmpeg', '-version'], capture_output=True, text=True, check=True)
         except FileNotFoundError:

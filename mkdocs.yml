@@ -31,6 +31,7 @@ theme:
 nav:
   - Home: index.md
   - Main: main.md
+  - Reference: reference.md
   - Classes:
       - Classes module: classes/__init__.md
       - VideoDownloader: classes/video_downloader.md

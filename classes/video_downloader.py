@@ -34,7 +34,6 @@ class VideoDownloader:
         playlist_folder (str): Folder path for playlist downloads.
         mode (str): Download mode, either 'Video' or 'Audio only'.
     """
-
     def __init__(self):
         """Initialize the downloader and verify the download folder."""
         self.download_folder = app_config.download_folder
@@ -45,9 +44,17 @@ class VideoDownloader:
         self.is_playlist = False
         self.playlist_folder = None
         self.mode = None
+        self.custom_filename = None
 
     def verify_download_folder(self) -> None:
-        """Check if the download folder exists, or prompt the user to provide one."""
+        """Ensure the configured download folder exists, prompting user if needed.
+
+        If the configured folder does not exist, the user can provide a different
+        path. The function will create the folder if it does not exist.
+
+        Returns:
+            None: This function updates the instance's ``download_folder`` attribute.
+        """
         question = [
             inquirer.Confirm('use_default',
                              message=f"Is the default download path ({self.download_folder}) correct?",
@@ -61,8 +68,22 @@ class VideoDownloader:
         if not os.path.exists(self.download_folder):
             os.makedirs(self.download_folder)
 
+    def _sanitize_filename(self, name: str) -> str:
+        """Sanitize filename by removing or replacing characters invalid in file names."""
+        invalid_chars = '<>:"/\\|?*'
+        for ch in invalid_chars:
+            name = name.replace(ch, '_')
+        return name.strip()
+
     def prompt_user_options(self) -> None:
-        """Prompt the user to select URLs, mode, quality, output format, and playlist folder."""
+        """Prompt the user for download source, mode and format options.
+
+        After this call the instance attributes ``urls``, ``mode``, ``quality`` and
+        ``output_format`` will be set based on user choices.
+
+        Returns:
+            None
+        """
         source_ans = inquirer.prompt([
             inquirer.List('source',
                           message="Choose source of links", choices=['Single URL', 'TXT File'])
@@ -79,6 +100,14 @@ class VideoDownloader:
                 self.playlist_folder = os.path.join(self.download_folder, folder_ans.get('playlist_folder'))
                 if not os.path.exists(self.playlist_folder):
                     os.makedirs(self.playlist_folder)
+            else:
+                filename_ans = inquirer.prompt([inquirer.Text('filename',
+                                                              message="Enter a new filename (default original title)")])
+                filename = (filename_ans.get('filename') or '').strip()
+                if filename:
+                    filename = os.path.splitext(filename)[0]
+                    filename = self._sanitize_filename(filename)
+                    self.custom_filename = filename
 
         else:
             file_answer = inquirer.prompt([inquirer.Text('file', message="Enter path to TXT file with links")])
@@ -119,6 +148,8 @@ class VideoDownloader:
             summary += f"Quality: {self.quality}\nOutput format: {self.output_format}\n"
         if self.is_playlist:
             summary += f"Playlist folder: {self.playlist_folder}\n"
+        if getattr(self, 'custom_filename', None) and len(self.urls) == 1 and not self.is_playlist:
+            summary += f"Custom filename: {self.custom_filename}\n"
         summary += f"Download folder: {self.download_folder}\n-----------------------------------\n"
         print(summary)
         confirm = inquirer.prompt([inquirer.Confirm('confirm', message="Are these options correct?", default=True)])
@@ -141,17 +172,24 @@ class VideoDownloader:
     @network_required
     @timed
     def download_video(self) -> None:
-        """Download all URLs using yt-dlp and cookies.txt.
+        """Download configured URLs using ``yt-dlp`` and the project's cookies.
 
-        Handles playlists and non-playlist videos, applying the selected quality
-        and output format.
+        Applies the selected quality and output format. Handles playlists by
+        placing downloads in a playlist folder when configured. Errors from
+        ``subprocess`` calls are caught and reported per-URL.
+
+        Returns:
+            None
         """
         for url in self.urls:
             is_playlist = 'list=' in url
             if is_playlist and self.playlist_folder:
                 output_path = os.path.join(self.playlist_folder, '%(title)s.%(ext)s')
             else:
-                output_path = os.path.join(self.download_folder, '%(title)s.%(ext)s')
+                if len(self.urls) == 1 and self.custom_filename and not is_playlist:
+                    output_path = os.path.join(self.download_folder, f"{self.custom_filename}.%(ext)s")
+                else:
+                    output_path = os.path.join(self.download_folder, '%(title)s.%(ext)s')
 
             cmd = ['yt-dlp', '--cookies', 'cookies.txt', '-o', output_path, url]
 
@@ -166,6 +204,12 @@ class VideoDownloader:
 
             try:
                 print(f"Downloading: {url}")
+                if len(self.urls) == 1 and self.custom_filename and not is_playlist:
+                    if self.mode == 'Video':
+                        ext_display = self.output_format.lower() if self.output_format else 'file'
+                    else:
+                        ext_display = 'mp3'
+                    print(f"Saving as: {self.custom_filename}.{ext_display}")
                 subprocess.run(cmd, check=True)
                 print(f"\nSuccessful download: {url}")
             except subprocess.CalledProcessError as e:

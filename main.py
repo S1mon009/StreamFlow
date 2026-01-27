@@ -16,15 +16,11 @@ from utils.console import clear_console
 def main() -> None:
     """Run the Video Downloader application.
 
-    Steps:
-        1. Clears the console.
-        2. Prompts the user repeatedly for download options (single URL or TXT file).
-        3. If the user confirms the options, starts the download process.
-        4. After each batch, asks the user if they want to download more.
-        5. Continues the loop until the user declines further downloads.
+    Continuously prompts the user for download options and executes downloads
+    until the user chooses to exit.
 
     Returns:
-        None
+        None: This function does not return a value.
     """
     clear_console()
     print(text2art("StreamFlow"))

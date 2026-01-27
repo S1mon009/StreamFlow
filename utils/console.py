@@ -10,9 +10,9 @@ import os
 def clear_console() -> None:
     """Clear the console screen.
 
-    This function works for both Windows ('cls') and Unix-based ('clear') operating systems.
+    Works for both Windows (``cls``) and Unix-based (``clear``) operating systems.
 
     Returns:
-        None
+        None: This function does not return a value.
     """
     os.system('cls' if os.name == 'nt' else 'clear')

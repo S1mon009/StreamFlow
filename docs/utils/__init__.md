@@ -1,3 +1,7 @@
 # Utilities package
 
-:::utils
+This page lists the modules contained in the `utils` package.
+
+## Modules
+
+- [console](console.md) — Console helper utilities.

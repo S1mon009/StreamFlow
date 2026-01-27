@@ -1,7 +1,7 @@
 # Video Downloader Documentation
 
 Welcome to the official documentation for the **Video Downloader** application.  
-This application allows downloading videos, audio, and playlists from YouTube using `yt-dlp`, with support for multiple qualities, output formats, and network handling.
+This application allows downloading videos, audio, and playlists from YouTube using `yt-dlp` and `ffmpeg`, with support for multiple qualities, output formats, and network handling.
 
 ---
 
@@ -20,7 +20,7 @@ The Video Downloader app provides a command-line interface to:
 ## Installation
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/S1mon009/StreamFlow
 cd my_project
 pip install -r requirements.txt
 ```
