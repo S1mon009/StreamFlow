@@ -12,7 +12,6 @@ from art import text2art
 from classes.video_downloader import VideoDownloader
 from utils.console import clear_console
 
-
 def main() -> None:
     """Run the Video Downloader application.
 
