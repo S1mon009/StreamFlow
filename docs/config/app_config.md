@@ -1,3 +1,3 @@
 # App config module
 
-:::config.app_config
+:::src.config.app_config

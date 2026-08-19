@@ -1,6 +1,6 @@
 # Video Downloader Module
 
-:::classes.video_downloader
+:::src.classes.video_downloader
 
 ---
 

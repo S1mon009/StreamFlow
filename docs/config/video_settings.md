@@ -1,3 +1,3 @@
 # Video settings module
 
-:::config.video_settings
+:::src.config.video_settings

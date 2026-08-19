@@ -1,3 +1,3 @@
 # Console module
 
-:::utils.console
+:::src.utils.console

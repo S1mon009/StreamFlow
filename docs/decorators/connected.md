@@ -1,3 +1,3 @@
 # Connected module
 
-:::decorators.connected
+:::src.decorators.connected

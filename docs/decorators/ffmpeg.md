@@ -1,3 +1,3 @@
 # Ffmpeg module
 
-:::decorators.ffmpeg
+:::src.decorators.ffmpeg
