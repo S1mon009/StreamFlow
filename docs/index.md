@@ -1,114 +1,76 @@
-# StreamFlow CLI — Professional Getting Started
+# StreamFlow
 
-Welcome to the official documentation for **StreamFlow CLI** — a complete command-line application for downloading videos and audio. This project is designed as a flexible CLI tool that integrates `yt-dlp`, `FFmpeg`, environment-based configuration, and intelligent decorators for stability and reliable execution.
+StreamFlow is a Python-based command-line application for downloading video and audio content using [yt-dlp](https://github.com/yt-dlp/yt-dlp).
 
----
+The application provides an interactive terminal interface that allows users to configure downloads without manually constructing `yt-dlp` commands.
 
-## About the Project
+StreamFlow supports:
 
-StreamFlow CLI is a command-line utility for users who need an efficient and dependable tool for downloading videos and audios.
+* single video downloads;
+* playlist downloads;
+* multiple URLs loaded from a text file;
+* video downloads;
+* audio-only downloads;
+* configurable video quality;
+* MP4 and MKV output;
+* custom filenames;
+* configurable download directories;
+* network connectivity monitoring;
+* FFmpeg availability checks;
+* download execution-time measurement.
 
-Key capabilities:
+## Features
 
-- Download single videos, playlists, or multiple links from a `.txt` file
-- Video mode and audio-only mode
-- Video quality selection and output format conversion
-- Download folder and file name management
-- Network connectivity monitoring and automatic resume handling
-- Automatic FFmpeg dependency verification
-- Support for `cookies.txt` to access restricted or age-gated content
+### Interactive CLI
 
----
+StreamFlow uses an interactive terminal workflow. Instead of requiring a large number of command-line arguments, the application asks the user for the required configuration step by step.
 
-## Core Features
+### Video downloads
 
-- **Interactive guided prompts**: The CLI asks for source type, download mode, quality, and format.
-- **Playlist support and batch downloads**: Automatically detect playlists and read multiple URLs from a text file.
-- **Quality selection**:
-    - The best
-    - Medium (1440p)
-    - Above High (1080p)
-    - High (720p)
-    - Low (<=480p)
-- **Supported output formats**: `Mp4`, `Mkv`; audio downloads are saved as `mp3`.
-- **Configuration management**: Default download folder can be customized via `.env`.
-- **Download validation**: Checks for `FFmpeg` and network availability before starting.
+Users can select one of several predefined quality levels, from low-quality downloads up to the best available quality.
 
----
+Supported video containers are currently:
 
-## Installation
+* MP4
+* MKV
 
-1.Clone the repository:
+### Audio-only downloads
 
-```bash
-git clone https://github.com/S1mon009/StreamFlow/CLI
-cd CLI
-```
+StreamFlow can extract audio from a source and save it as MP3.
 
-2.Create and activate a virtual environment:
+### Playlist support
 
-```bash
-python -m venv .venv
-.venv\Scripts\activate
-```
+URLs containing a `list=` parameter are treated as playlists. StreamFlow creates a dedicated directory for the playlist and downloads its contents there.
 
-3.Install dependencies:
+### Multiple URLs
 
-```bash
-pip install -r requirements.txt
-```
+A text file can be used as a source containing multiple URLs. Each non-empty line is treated as a separate download URL.
 
-4.Ensure `yt-dlp` and `ffmpeg` are available on your PATH.
+### Network resilience
 
----
+The application checks network connectivity before starting a download and can wait for connectivity to return when the connection is lost during a download.
 
-## Configuration
+### FFmpeg integration
 
-The application configuration in `config/app_config.py` reads the `DOWNLOAD_FOLDER` value from a `.env` file.
+FFmpeg is required for multimedia processing. StreamFlow verifies that FFmpeg is available before starting the download operation.
 
-Example `.env`:
+## Documentation
 
-```ini
-DOWNLOAD_FOLDER=C:\Users\YourUser\Downloads\StreamFlow
-```
+The documentation is divided into several sections:
 
-If the folder does not exist, the app prompts for a new path and creates the directory automatically.
+* **Getting started** — installation and first steps;
+* **User guide** — detailed information about download functionality;
+* **Architecture** — internal project structure and execution flow;
+* **API** — Python API reference;
+* **Development** — information for contributors;
+* **Reference** — FAQ and troubleshooting.
 
----
+## Project repository
 
-## Usage
+The source code is available on GitHub:
 
-Run the program:
+[StreamFlow](https://github.com/S1mon009/StreamFlow)
 
-```bash
-python main.py
-```
+## License
 
-Then:
-
-1. choose the source type (single URL or `.txt` file),
-2. choose download mode (`Video` or `Audio only`),
-3. choose quality and format,
-4. confirm settings and start the download.
-
----
-
-## How It Works
-
-1. `main.py` creates a `VideoDownloader` instance and calls `prompt_user_options()`.
-2. `VideoDownloader` prompts for:
-   - source type,
-   - URL or link file path,
-   - download mode,
-   - video quality and format.
-3. The user confirms selections in `confirm_options()`.
-4. `download_video()` builds the `yt-dlp` command and executes it with `subprocess.run()`.
-5. If network connectivity is lost, `progress_hook()` waits until the connection is restored.
-6. If `FFmpeg` is required for merging or format conversion, the `ffmpeg_required` decorator ensures it is installed.
-
----
-
-## `cookies.txt` Support
-
-The `cookies.txt` file is used by `yt-dlp` to download content that requires authentication or cookies. Place the file in the project root to improve support for age-restricted or protected videos.
-
+See the repository license for information about the terms under which StreamFlow may be used and distributed.

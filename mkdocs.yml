@@ -33,23 +33,34 @@ theme:
 
 nav:
   - Home: index.md
-  - Reference: reference.md
-  - Main entry point: main.md
-  - Classes:
-      - Classes module: classes/__init__.md
-      - VideoDownloader: classes/video_downloader.md
-  - Decorators:
-      - Decorators module: decorators/__init__.md
-      - connected: decorators/connected.md
-      - ffmpeg: decorators/ffmpeg.md
-      - timed: decorators/timed.md
-  - Utilities:
-      - Utilities module: utils/__init__.md
-      - console: utils/console.md
-  - Config:
-      - Config module: config/__init__.md
-      - app_config: config/app_config.md
-      - video_settings: config/video_settings.md
+  - Getting started:
+    - Installation: getting-started/installation.md
+    - Configuration: getting-started/configuration.md
+    - First download: getting-started/first-download.md
+  - Guide:
+    - Download modes: guide/download-modes.md
+    - Quality and formats: guide/quality-and-formats.md
+    - Sources: guide/sources.md
+    - Network: guide/network.md
+    - Cookies: guide/cookies.md
+  - Architecture:
+    - Overview: architecture/overview.md
+    - Project structure: architecture/project-structure.md
+    - Download flow: architecture/download-flow.md
+  - API:
+    - Home: api/index.md
+    - Video downloader: api/video-downloader.md
+    - Configuration: api/configuration.md
+    - Decorators: api/decorators.md
+    - Utilities: api/utilities.md
+    - Main: api/main.md
+  - Development:
+    - Local development: development/local-development.md
+    - Contribution: development/contribution.md
+  - Reference:
+    - FAQ: reference/faq.md
+    - Troubleshooting: reference/troubleshooting.md
+    - Legal: reference/legal.md
 
 plugins:
   - search
