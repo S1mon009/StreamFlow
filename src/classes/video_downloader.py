@@ -9,8 +9,9 @@ import os
 import time
 import subprocess
 import inquirer
-from decorators import timed, ffmpeg_required, is_connected, network_required
-from config import video_settings, app_config
+from src.decorators import timed
+from src.config import video_settings, app_config
+from src.decorators import ffmpeg_required, is_connected, network_required
 
 class VideoDownloader:
     """

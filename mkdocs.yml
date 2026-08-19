@@ -1,6 +1,9 @@
-site_name: Video Downloader Docs (CLI)
-site_description: Documentation for the Video Downloader app (CLI version)
-site_author: S1mon009
+site_name: StreamFlow
+site_description: Documentation for StreamFlow
+site_url: https://s1mon009.github.io/StreamFlow/
+
+repo_name: S1mon009/StreamFlow
+repo_url: https://github.com/S1mon009/StreamFlow
 
 theme:
   name: material
@@ -30,8 +33,8 @@ theme:
 
 nav:
   - Home: index.md
-  - Main: main.md
   - Reference: reference.md
+  - Main entry point: main.md
   - Classes:
       - Classes module: classes/__init__.md
       - VideoDownloader: classes/video_downloader.md
