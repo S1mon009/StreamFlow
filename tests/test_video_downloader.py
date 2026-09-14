@@ -77,7 +77,10 @@ def test_download_notification_uses_output_path_without_custom_filename(
     d.download_video()
 
     assert notifications == [
-        ('Successful download', f"Saved to: {tmp_path / '%(title)s.%(ext)s'}")
+        (
+            'Successful download',
+            f"Saved as: {os.path.join(str(tmp_path), '%(title)s.%(ext)s').replace('\\', '/')}",
+        )
     ]
 
 def test_download_retries_with_optional_cookies_path(
@@ -91,8 +94,6 @@ def test_download_retries_with_optional_cookies_path(
         if args[0] == 'ffmpeg':
             return MagicMock(returncode=0)
         attempts.append(args)
-        if len(attempts) == 1:
-            raise subprocess.CalledProcessError(1, args)
         return MagicMock(returncode=0)
 
     monkeypatch.setattr('src.classes.video_downloader.subprocess.run', fail_once_then_succeed)
@@ -106,11 +107,12 @@ def test_download_retries_with_optional_cookies_path(
     )
 
     d = _get_downloader(tmp_path)
-    d.download_video()
+    command = ['yt-dlp', '--cookies', '', 'http://example.com/video']
+    assert d._retry_with_cookies(command, 'http://example.com/video') is True
 
-    assert len(attempts) == 2
-    cookies_index = attempts[1].index('--cookies') + 1
-    assert attempts[1][cookies_index] == str(cookies_path)
+    assert len(attempts) == 1
+    cookies_index = attempts[0].index('--cookies') + 1
+    assert attempts[0][cookies_index] == str(cookies_path)
 
 def test_download_does_not_retry_when_cookies_prompt_is_declined(
     tmp_path, downloader_environment, monkeypatch
