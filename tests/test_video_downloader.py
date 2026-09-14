@@ -1,4 +1,5 @@
 import os
+import subprocess
 import pytest
 from unittest.mock import MagicMock
 from src.classes.video_downloader import VideoDownloader
@@ -78,6 +79,60 @@ def test_download_notification_uses_output_path_without_custom_filename(
     assert notifications == [
         ('Successful download', f"Saved to: {tmp_path / '%(title)s.%(ext)s'}")
     ]
+
+def test_download_retries_with_optional_cookies_path(
+    tmp_path, downloader_environment, monkeypatch
+):
+    cookies_path = tmp_path / 'browser-cookies.txt'
+    cookies_path.write_text('cookies', encoding='utf-8')
+    attempts = []
+
+    def fail_once_then_succeed(args, **kwargs):
+        if args[0] == 'ffmpeg':
+            return MagicMock(returncode=0)
+        attempts.append(args)
+        if len(attempts) == 1:
+            raise subprocess.CalledProcessError(1, args)
+        return MagicMock(returncode=0)
+
+    monkeypatch.setattr('src.classes.video_downloader.subprocess.run', fail_once_then_succeed)
+    prompts = iter([
+        {'use_cookies': True},
+        {'cookies_path': str(cookies_path)},
+    ])
+    monkeypatch.setattr(
+        'src.classes.video_downloader.inquirer.prompt',
+        lambda *args, **kwargs: next(prompts),
+    )
+
+    d = _get_downloader(tmp_path)
+    d.download_video()
+
+    assert len(attempts) == 2
+    cookies_index = attempts[1].index('--cookies') + 1
+    assert attempts[1][cookies_index] == str(cookies_path)
+
+def test_download_does_not_retry_when_cookies_prompt_is_declined(
+    tmp_path, downloader_environment, monkeypatch
+):
+    attempts = []
+
+    def fail_download(args, **kwargs):
+        if args[0] == 'ffmpeg':
+            return MagicMock(returncode=0)
+        attempts.append(args)
+        raise subprocess.CalledProcessError(1, args)
+
+    monkeypatch.setattr('src.classes.video_downloader.subprocess.run', fail_download)
+    monkeypatch.setattr(
+        'src.classes.video_downloader.inquirer.prompt',
+        lambda *args, **kwargs: {'use_cookies': False},
+    )
+
+    d = _get_downloader(tmp_path)
+    d.download_video()
+
+    assert len(attempts) == 1
 
 def test_playlist_download_uses_playlist_folder(tmp_path, downloader_environment):
     playlist_url = 'http://example.com/watch?v=1&list=PL123'

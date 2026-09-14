@@ -69,7 +69,14 @@ class VideoDownloader:
             os.makedirs(self.download_folder)
 
     def _sanitize_filename(self, name: str) -> str:
-        """Sanitize filename by removing or replacing characters invalid in file names."""
+        """Sanitize filename by removing or replacing characters invalid in file names.
+        
+        Args:
+            name (str): The original filename to sanitize.
+            
+        Returns:
+            str: The sanitized filename with invalid characters replaced by underscores.
+        """
         invalid_chars = '<>:"/\\|?*'
         for ch in invalid_chars:
             name = name.replace(ch, '_')
@@ -160,6 +167,9 @@ class VideoDownloader:
 
         Args:
             d (dict): yt-dlp download status dictionary.
+            
+        Returns:
+            None
         """
         if d.get('status') == 'downloading':
             if not is_connected():
@@ -167,6 +177,48 @@ class VideoDownloader:
                 while not is_connected():
                     time.sleep(5)
                 print("Connection restored. Resuming download...")
+
+    def _retry_with_cookies(self, command: list[str], url: str) -> bool:
+        """Ask for a cookies file after a failed download and retry once.
+        
+        Args:
+            command (list[str]): The original command used for downloading.
+            url (str): The URL that failed to download.
+            
+        Returns:
+            bool: True if the retry was successful, False otherwise.
+        """
+        answer = inquirer.prompt([
+            inquirer.Confirm(
+                'use_cookies',
+                message="Do you want to retry with a cookies file?",
+                default=False,
+            )
+        ])
+        if not answer or not answer.get('use_cookies'):
+            return False
+
+        cookies_answer = inquirer.prompt([
+            inquirer.Text('cookies_path', message="Enter the path to the cookies file")
+        ])
+        cookies_path = (cookies_answer or {}).get('cookies_path', '').strip()
+        if not cookies_path:
+            print("No cookies path provided. Download cancelled.")
+            return False
+        if not os.path.isfile(cookies_path):
+            print(f"Cookies file not found: {cookies_path}")
+            return False
+
+        retry_command = command.copy()
+        cookies_index = retry_command.index('--cookies') + 1
+        retry_command[cookies_index] = cookies_path
+        try:
+            print(f"Retrying download with cookies: {cookies_path}")
+            subprocess.run(retry_command, check=True)
+            return True
+        except subprocess.CalledProcessError as error:
+            print(f"\nRetry failed for {url}: {error}")
+            return False
 
     @ffmpeg_required
     @network_required
@@ -191,7 +243,11 @@ class VideoDownloader:
                 else:
                     output_path = os.path.join(self.download_folder, '%(title)s.%(ext)s')
 
-            cmd = ['yt-dlp', '--cookies', 'cookies.txt', '-o', output_path, url]
+            cmd = [
+                'yt-dlp',
+                '-o', output_path,
+                url
+            ]
 
             if self.mode == "Video":
                 cmd.extend(['-f', video_settings.quality_map.get(self.quality, 'bestvideo+bestaudio/best'),
@@ -210,9 +266,19 @@ class VideoDownloader:
                     else:
                         ext_display = 'mp3'
                     print(f"Saving as: {self.custom_filename}.{ext_display}")
-                subprocess.run(cmd, check=True)
+
+                subprocess.run(
+                    cmd,
+                    check=True
+                )
                 send_notification("Successful download",
-                                  f"Saved to: {output_path}")
+                                f"Saved as: {(output_path).replace('\\', '/')
+                                if not self.custom_filename
+                                else os.path.join(self.download_folder, f'{self.custom_filename}.{ext_display}').replace('\\', '/')}")
                 print(f"\nSuccessful download: {url}")
             except subprocess.CalledProcessError as e:
                 print(f"\nDownload error for {url}: {e}")
+                if self._retry_with_cookies(cmd, url):
+                    send_notification("Successful download",
+                                      f"Saved to: {output_path}")
+                    print(f"\nSuccessful download: {url}")

@@ -40,6 +40,8 @@ jobs:
           --icon assets/icon.ico `
           --add-data "assets;assets" `
           --copy-metadata readchar `
+          --hidden-import=plyer `
+          --hidden-import=plyer.platforms.win.notification `
           main.py
 
       - name: Install Inno Setup
