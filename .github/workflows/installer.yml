@@ -52,7 +52,26 @@ jobs:
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force -Path release | Out-Null
-          & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" ".\installer\StreamFlow.iss"
+          $iscc = Join-Path ${env:ProgramFiles(x86)} "Inno Setup 6\ISCC.exe"
+          if (-not (Test-Path $iscc)) {
+            throw "Inno Setup compiler not found at: $iscc"
+          }
+
+          Push-Location .\installer
+          try {
+            $iss = (Resolve-Path .\StreamFlow.iss).Path
+            if (-not (Test-Path ..\dist\StreamFlow\StreamFlow.exe)) {
+              throw "PyInstaller output not found at ..\dist\StreamFlow\StreamFlow.exe"
+            }
+
+            & $iscc "/DAppVersion=$env:APP_VERSION" $iss
+            if ($LASTEXITCODE -ne 0) {
+              throw "Inno Setup compiler failed with exit code $LASTEXITCODE"
+            }
+          }
+          finally {
+            Pop-Location
+          }
 
       - name: Upload installer artifact
         uses: actions/upload-artifact@v4
