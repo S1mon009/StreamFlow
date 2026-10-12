@@ -57,20 +57,22 @@ jobs:
             throw "Inno Setup compiler not found at: $iscc"
           }
 
-          Push-Location .\installer
-          try {
-            $iss = (Resolve-Path .\StreamFlow.iss).Path
-            if (-not (Test-Path ..\dist\StreamFlow\StreamFlow.exe)) {
-              throw "PyInstaller output not found at ..\dist\StreamFlow\StreamFlow.exe"
-            }
+          $iss = (Resolve-Path .\installer\StreamFlow.iss).Path
+          $appExe = (Resolve-Path .\dist\StreamFlow\StreamFlow.exe).Path
+          $appIcon = (Resolve-Path .\assets\icon.ico).Path
+          Write-Host "Compiling installer script: $iss"
+          Write-Host "Application executable: $appExe"
+          Write-Host "Application icon: $appIcon"
+          Write-Host "Installer output directory: $(Resolve-Path .\release)"
 
-            & $iscc "/DAppVersion=$env:APP_VERSION" $iss
-            if ($LASTEXITCODE -ne 0) {
-              throw "Inno Setup compiler failed with exit code $LASTEXITCODE"
-            }
+          & $iscc "/DAppVersion=$env:APP_VERSION" $iss
+          if ($LASTEXITCODE -ne 0) {
+            throw "Inno Setup compiler failed with exit code $LASTEXITCODE"
           }
-          finally {
-            Pop-Location
+
+          $installer = Get-ChildItem .\release\StreamFlow-Setup-*.exe
+          if (-not $installer) {
+            throw "Inno Setup completed without producing an installer in .\release"
           }
 
       - name: Upload installer artifact
