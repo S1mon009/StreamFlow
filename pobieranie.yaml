@@ -1,0 +1,34 @@
+version: 1
+
+downloads:
+  - name: "Strike the blood III"
+
+    urls:
+      - "https://www.cda.pl/video/685717024"
+      - "https://www.cda.pl/video/6856963af"
+      - "https://www.cda.pl/video/685770443"
+      - "https://www.cda.pl/video/6856639b0"
+      - "https://www.cda.pl/video/685690022"
+      - "https://www.cda.pl/video/6858364c7"
+      - "https://www.cda.pl/video/68576261e"
+      - "https://www.cda.pl/video/68584249e"
+      - "https://www.cda.pl/video/6858487d9"
+      - "https://www.cda.pl/video/6858514aa"
+      - "https://www.cda.pl/video/685857477"
+
+    output:
+      folder: "E:/Wideo/Srike the blood/Sezon 3"
+      prefix: "S03E"
+      suffix: ""
+
+    naming:
+      template: "{prefix}{index:02d}"
+
+      indexing:
+        enabled: true
+        start: 1
+
+    media:
+      type: "video"
+      format: "mp4"
+      quality: "best"

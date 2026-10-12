@@ -83,6 +83,25 @@ def test_download_notification_uses_output_path_without_custom_filename(
         )
     ]
 
+def test_custom_filename_notification_includes_resolved_extension(
+    tmp_path, downloader_environment, monkeypatch
+):
+    notifications = []
+    monkeypatch.setattr(
+        'src.classes.video_downloader.send_notification',
+        lambda title, message: notifications.append((title, message)),
+    )
+    d = _get_downloader(tmp_path, custom_filename='my_video')
+
+    d.download_video()
+
+    assert notifications == [
+        (
+            'Successful download',
+            f"Saved as: {os.path.join(str(tmp_path), 'my_video.mp4').replace('\\', '/')}",
+        )
+    ]
+
 def test_download_retries_with_optional_cookies_path(
     tmp_path, downloader_environment, monkeypatch
 ):
@@ -183,3 +202,132 @@ def test_sanitize_filename(monkeypatch):
     for ch in '<>:"/\\|?*':
         assert ch not in clean
     assert clean == 'inva_________name'
+
+def test_load_yaml_profiles(tmp_path, monkeypatch):
+    monkeypatch.setattr('src.classes.video_downloader.VideoDownloader.verify_download_folder', lambda self: None)
+    config_path = tmp_path / 'downloads.yaml'
+    config_path.write_text(
+        '''
+version: 1
+downloads:
+  - name: YouTube videos
+    urls:
+      - https://www.youtube.com/watch?v=VIDEO_ID
+    output:
+      folder: ./videos
+      prefix: "[YT] "
+      suffix: ""
+    naming:
+      template: "{prefix}{index:02d} - {title}{suffix}"
+      indexing:
+        enabled: true
+        start: 3
+        padding: 2
+    media:
+      type: video
+      format: mkv
+      quality: 1080p
+''',
+        encoding='utf-8',
+    )
+
+    profile = VideoDownloader()._load_yaml_profiles(str(config_path))[0]
+
+    assert profile['name'] == 'YouTube videos'
+    assert profile['urls'] == ['https://www.youtube.com/watch?v=VIDEO_ID']
+    assert os.path.normpath(profile['folder']) == os.path.normpath('./videos')
+    assert profile['mode'] == 'Video'
+    assert profile['quality'] == '1080p'
+    assert profile['output_format'] == 'mkv'
+
+def test_txt_source_prompts_for_output_naming_and_media_options(
+    tmp_path, monkeypatch
+):
+    monkeypatch.setattr(
+        'src.classes.video_downloader.VideoDownloader.verify_download_folder',
+        lambda self: None,
+    )
+    urls_path = tmp_path / 'urls.txt'
+    urls_path.write_text('https://example.com/video\n', encoding='utf-8')
+    answers = iter([
+        {'source': 'TXT File'},
+        {'file': str(urls_path)},
+        {'name': 'TXT group'},
+        {'folder': str(tmp_path / 'output'), 'prefix': '[YT] ', 'suffix': ''},
+        {'template': '{prefix}{index:02d} - {title}{suffix}', 'indexing': True},
+        {'start': '4', 'padding': '2'},
+        {'type': 'audio'},
+        {'format': 'mp3', 'quality': 'best'},
+    ])
+    monkeypatch.setattr(
+        'src.classes.video_downloader.inquirer.prompt',
+        lambda *args, **kwargs: next(answers),
+    )
+
+    downloader = VideoDownloader()
+    downloader.prompt_user_options()
+
+    profile = downloader.download_profiles[0]
+    assert profile['name'] == 'TXT group'
+    assert profile['folder'] == str(tmp_path / 'output')
+    assert profile['prefix'] == '[YT] '
+    assert profile['template'] == '{prefix}{index:02d} - {title}{suffix}'
+    assert profile['indexing'] == {'enabled': True, 'start': 4, 'padding': 2}
+    assert profile['mode'] == 'Audio only'
+    assert profile['output_format'] == 'mp3'
+    assert profile['quality'] == 'best'
+
+def test_yaml_profile_generates_numbered_yt_dlp_template(
+    tmp_path, downloader_environment
+):
+    d = _get_downloader(tmp_path, urls=['https://www.youtube.com/playlist?list=PL123'])
+    d.download_profiles = [{
+        'name': 'Anime',
+        'urls': ['https://www.youtube.com/playlist?list=PL123'],
+        'folder': str(tmp_path),
+        'prefix': '',
+        'suffix': '',
+        'template': '{prefix}S01E{index:02d} - {title}{suffix}',
+        'indexing': {'enabled': True, 'start': 1, 'padding': 2},
+        'mode': 'Video',
+        'quality': '1080p',
+        'output_format': 'mkv',
+        'audio_quality': 'best',
+    }]
+
+    d.download_video()
+
+    cmd = _extract_yt_dlp_command(downloader_environment)
+    assert cmd[cmd.index('-o') + 1] == os.path.join(
+        str(tmp_path), 'S01E%(autonumber)02d - %(title)s.%(ext)s'
+    )
+    assert cmd[cmd.index('--autonumber-start') + 1] == '1'
+    assert cmd[cmd.index('--merge-output-format') + 1] == 'mkv'
+    assert '--no-playlist' not in cmd
+
+def test_yaml_audio_profile_uses_selected_format_and_best_quality(
+    tmp_path, downloader_environment
+):
+    d = _get_downloader(tmp_path, mode='Audio only', output_format=None)
+    d.download_profiles = [{
+        'name': 'Music',
+        'urls': ['https://www.youtube.com/watch?v=MUSIC_ID'],
+        'folder': str(tmp_path),
+        'prefix': '',
+        'suffix': '',
+        'template': '{title}',
+        'indexing': {'enabled': False, 'start': 1, 'padding': 2},
+        'mode': 'Audio only',
+        'quality': 'best',
+        'output_format': 'mp3',
+        'audio_quality': 'best',
+    }]
+
+    d.download_video()
+
+    cmd = _extract_yt_dlp_command(downloader_environment)
+    assert cmd[cmd.index('--audio-format') + 1] == 'mp3'
+    assert cmd[cmd.index('--audio-quality') + 1] == '0'
+    assert cmd[cmd.index('-o') + 1] == os.path.join(
+        str(tmp_path), '%(title)s.%(ext)s'
+    )
